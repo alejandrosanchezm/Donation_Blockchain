@@ -32,6 +32,12 @@ def enviar_bloque(ip_receptor,puerto_receptor, bloque, blockchain):
     answer = requests.post(server, headers={ "Content-Type" : "application/json"}, params={"bloque":json.dumps(bloque),"blockchain":BlockchainEncoder().encode(blockchain)})   
     return bytes.decode(answer.content)
 
+def solicitar_eliminar_bloque(ip_receptor,puerto_receptor):
+    # Hago una petición POST a un nodo con los datos de la blockchain
+    server = "http://" + ip_receptor + ":" + puerto_receptor + "/eliminar_ultimo_bloque"
+    answer = requests.post(server, headers={ "Content-Type" : "application/json"})   
+    return bytes.decode(answer.content)
+
 def validarDNI(dni):
         if(len(dni)==9):
             if(dni[0:8].isdigit()):

@@ -5,8 +5,6 @@ puerto_cliente = None
 ip_coordinador = None
 puerto_coordinador = None
 
-num_personas = 0
-
 tabla = []
 
 blockchain = None
