@@ -50,10 +50,10 @@ Los argumentos para iniciar el servidor son los siguientes en este orden:
 
 Para iniciar un nodo coordinador:
   
-    $ python run.py True localhost 5000
+    $ python run.py -c True -ip localhost -p 5000
 Para iniciar un nodo cliente:
   
-    $ python run.py False localhost 5001 localhost 5000
+    $ python run.py -c False -ip localhost -p 5001 -ipc localhost -pc 5000
     
 ### Cómo funciona la Blockchain
 
