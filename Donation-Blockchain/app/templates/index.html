@@ -14,7 +14,7 @@
                             <label for="payment_type">Selecciona la cantidad que quieres pagar</label>
                             <select class="form-control" id="payment_type" name="payment-type" required>
                                 {% for key, value in pay_options.items() %}
-                                <option value="{{ key }}">{{ value }}</option>
+                                <option value="{{ key }}">{{ value }}€</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -30,14 +30,6 @@
                         <button type="submit" class="btn btn-danger m-4">Pagar</button>
                     </form>
                 </div>
-            </div>
-            <hr>
-            <div class="container m-4">
-                {% if num_personas > 0 %}
-                <div class="card">
-                    <h4>Han pagado {{ num_personas }} personas</h4>
-                </div>
-                {% endif %}
             </div>
         </div>
     </div>

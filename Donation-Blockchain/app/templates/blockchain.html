@@ -16,22 +16,21 @@
                     </tr>
                 </thead>
                 <tbody id="MyTable">
-                    {% for item in tabla %}
-                    <tr>
+                    {% for item in tabla %} {%if item.tipoTransaccion == 'pago'%}
+                    <tr class='table-success'>
                         <td>{{ item.DNI }}</td>
                         <td>{{ item.ConceptoPago }}</td>
                         <td>{{ item.DineroAportado }}</td>
                     </tr>
-                    {% endfor %}
+                    {%elif item.tipoTransaccion == 'gasto'%}
+                    <tr class='table-danger'>
+                        <td>{{ item.IDAdministrador }}</td>
+                        <td>{{ item.ConceptoGasto }}</td>
+                        <td>{{ item.DineroGastado }}</td>
+                    </tr>
+                    {%endif%} {% endfor %}
                 </tbody>
             </table>
-            <div class="container m-4">
-                {% if num_personas > 0 %}
-                <div class="card">
-                    <h4>Han pagado {{ num_personas }} personas</h4>
-                </div>
-                {% endif %}
-            </div>
         </div>
     </div>
 </div>
