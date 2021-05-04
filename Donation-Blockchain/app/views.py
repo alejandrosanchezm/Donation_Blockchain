@@ -5,7 +5,6 @@ from app import static_data as sd
 import requests
 import hashlib
 from app import view_functions as vf
-import socket
 import json
 from options import OptionsData
 from blockchain import BloqueDecoder, BlockchainDecoder
@@ -80,17 +79,18 @@ def index():
                         print(answer)
                         if answer != "OK":
                             sd.blockchain.eliminarBloque()
-                            return redirect(url_for("blockchain")), 400
+                            flash("El resto de nodos no han confirmado el bloque.","Danger")
+                            return redirect(request.url)
 
+            
+                # Añadimos los valores a la tabla a mostrar
+                sd.tabla.append(valores)
 
-            # Añadimos los valores a la tabla a mostrar
-            sd.tabla.append(valores)
+                # Incrementamos el número de personas
+                sd.num_personas = sd.num_personas + 1
 
-            # Incrementamos el número de personas
-            sd.num_personas = sd.num_personas + 1
-
-            # Redirige a la página de blockchain
-            return redirect(url_for("blockchain"))
+                # Redirige a la página de blockchain
+                return redirect(url_for("blockchain"))
 
         except:
             traceback.print_exc() 
@@ -124,7 +124,7 @@ def admin():
         # Si los valores son nulos, devolvemos un error
         if option == None or quantity == None:
             flash("Faltan datos.","Warning")
-            return redirect(url_for("admin")), 400
+            return redirect(request.url)
 
         # En caso contrario
         else:
@@ -141,7 +141,7 @@ def admin():
             # Si la cadena está vacía
             if bloque == None:
                 flash("Error: la cadena está vacía","Warning")
-                return redirect(url_for("blockchain")), 400
+                return redirect(request.url)
 
             # En caso contrario
             else:
@@ -158,11 +158,11 @@ def admin():
                         # Si el nodo no lo valida
                         if answer != "OK":
                             sd.blockchain.eliminarBloque()
-                            return redirect(url_for("blockchain")), 400
+                            return redirect(request.url)
 
                 # En caso de que se haya multidifundido con éxito, se lo indicamos
                 flash("Bloque añadido","Success")
-                return redirect(url_for("admin")), 200
+                return redirect(url_for("blockchain"))
 
     # Si es una petición GET, significa que está intentando acceder al panel de administrador
     else:
@@ -309,9 +309,10 @@ def recibir_bloque():
                 "ConceptoPago":bloque['ConceptoPago'],
                 "DineroAportado":int(bloque['DineroAportado'].replace("€",""))
             }
-            sd.blockchain.nuevaTransaccionPago(valores['DNI'],valores["ConceptoPago"],valores["DineroAportado"])
+            sd.blockchain.realizarPago(valores['DNI'],valores["ConceptoPago"],valores["DineroAportado"])
+
         else:
-            
+
             # Añadimos los nuevos datos a la tabla de valores que se van a mostrar
             valores = {
                 "tipoTransaccion":bloque['tipoTransaccion'],
@@ -319,14 +320,18 @@ def recibir_bloque():
                 "ConceptoGasto":bloque['ConceptoGasto'],
                 "DineroGastado":int(bloque['DineroGastado'].replace("€",""))
             }
-            sd.blockchain.nuevaTransaccionGasto(valores['IDAdministrador'],valores["ConceptoGasto"],valores["DineroGastado"])
+            sd.blockchain.realizarGasto(valores['IDAdministrador'],valores["ConceptoGasto"],valores["DineroGastado"])
 
         if sd.blockchain.areEqual(blockchain_recibida):
             # Incrementamos el número de personas que han visto la página
             sd.num_personas = sd.num_personas + 1
+
+            sd.tabla.append(valores)
+
             # Devolvemos OK
             return "OK", 200
         else:
+
             sd.blockchain.eliminarBloque()
             return "ERROR", 400
 
