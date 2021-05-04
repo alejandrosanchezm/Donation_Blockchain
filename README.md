@@ -22,7 +22,8 @@ Para realizar una instalación de las librerías utilizadas actualmente, ejecuta
     pip install -r requirements.txt
 
 ## Uso
-Cómo se inicial los nodos de la red
+
+### Cómo se inicial los nodos de la red
 
 La arquitectura de la red es la siguiente:
 
@@ -33,12 +34,12 @@ Así mismo, difundirá a todos los nodos de la red la ip y puerto del nuevo nodo
 
 - Los nodos clientes tendrán que conocer la dirección del nodo coordinador para conectarse a la red.
 
-![alt text](https://raw.githubusercontent.com/alejandrosanchezm/VotingBlockchain/master/imgs/Esquema1.png)
+![alt text](https://raw.githubusercontent.com/alejandrosanchezm/blockchain/tree/master/imgs/Esquema1.png)
 
 - Si un nodo cliente de la red se cierra, se indica al resto de nodos que ese nodo se ha eliminado para que lo eliminen de la agenda.
 - Si es el nodo coordinador el que se elimina, antes de cerrarse elegirá al primer nodo de la red como nodo coordinador
 
-![alt text](https://raw.githubusercontent.com/alejandrosanchezm/VotingBlockchain/master/imgs/Esquema2.png)
+![alt text](https://raw.githubusercontent.com/alejandrosanchezm/blockchain/tree/master/imgs/Esquema2.png)
 
 Los argumentos para iniciar el servidor son los siguientes en este orden:
 - ip cliente (es decir, la nuestra)
@@ -50,7 +51,13 @@ Los argumentos para iniciar el servidor son los siguientes en este orden:
 Para iniciar un nodo coordinador:
   
     $ python run.py True localhost 5000
- 
 Para iniciar un nodo cliente:
   
     $ python run.py False localhost 5001 localhost 5000
+    
+### Cómo funciona la Blockchain
+
+Este es el esquema mediante el cual funciona la blockchain:
+
+![alt text](https://raw.githubusercontent.com/alejandrosanchezm/blockchain/tree/master/imgs/Diagrama.png)
+
