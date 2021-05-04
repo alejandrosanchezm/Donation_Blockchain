@@ -254,6 +254,10 @@ class Blockchain:
             self.mostrarBloque(bloque)
             return bloque
         
+    def mostrarBlockchain(self):
+        for bloque in self.blockchain:
+            self.mostrarBloque(bloque)
+
 class BloqueEncoder(JSONEncoder):
 
     def default(self, object):
@@ -279,9 +283,20 @@ class BlockchainEncoder(JSONEncoder):
 
 def BlockchainDecoder(json_string):
 
+    if type(json_string) == str:
+        json_string_formatted = json.loads(json_string)
+    else:
+        json_string_formatted = json_string
     try:
-        bloques = [Bloque(hashBloqueAnterior=x['hashBloqueAnterior'],transaccion=x['transaccion'],indiceBloque=x['indiceBloque'],send_incognitaDeMinado=x['incognitaDeMinado'],send_hashBloque=x['hashBloque']) for x in json_string['blockchain']]
-        return Blockchain(bloques, json_string['transaccionNoValidada'])
+        bloques = []
+        #bloques = [Bloque(hashBloqueAnterior=x['hashBloqueAnterior'],transaccion=x['transaccion'],indiceBloque=x['indiceBloque'],send_incognitaDeMinado=x['incognitaDeMinado'],send_hashBloque=x['hashBloque']) for x in json_string_formatted['blockchain']]
+        for block in json_string_formatted['blockchain']:
+            if type(block) == str:
+                x = json.loads(block)
+            else:
+                x = block
+            bloques.append(Bloque(hashBloqueAnterior=x['hashBloqueAnterior'],transaccion=x['transaccion'],indiceBloque=x['indiceBloque'],send_incognitaDeMinado=x['incognitaDeMinado'],send_hashBloque=x['hashBloque']))
+        return Blockchain(bloques, json_string_formatted['transaccionNoValidada'])
     except:
         traceback.print_exc() 
         return None
