@@ -34,12 +34,12 @@ Así mismo, difundirá a todos los nodos de la red la ip y puerto del nuevo nodo
 
 - Los nodos clientes tendrán que conocer la dirección del nodo coordinador para conectarse a la red.
 
-![alt text](https://raw.githubusercontent.com/alejandrosanchezm/blockchain/blob/master/imgs/Esquema1.png)
+![alt text](https://raw.githubusercontent.com/alejandrosanchezm/blockchain/master/blob/imgs/Esquema1.png)
 
 - Si un nodo cliente de la red se cierra, se indica al resto de nodos que ese nodo se ha eliminado para que lo eliminen de la agenda.
 - Si es el nodo coordinador el que se elimina, antes de cerrarse elegirá al primer nodo de la red como nodo coordinador
 
-![alt text](https://raw.githubusercontent.com/alejandrosanchezm/blockchain/blob/master/imgs/Esquema2.png)
+![alt text](https://raw.githubusercontent.com/alejandrosanchezm/blockchain/master/blob/imgs/Esquema2.png)
 
 Los argumentos para iniciar el servidor son los siguientes en este orden:
 - ip cliente (es decir, la nuestra)
@@ -59,5 +59,5 @@ Para iniciar un nodo cliente:
 
 Este es el esquema mediante el cual funciona la blockchain:
 
-![alt text](https://raw.githubusercontent.com/alejandrosanchezm/blockchain/blob/master/imgs/Diagrama.png)
+![alt text](https://raw.githubusercontent.com/alejandrosanchezm/blockchain/master/blob/imgs/Diagrama.png)
 
