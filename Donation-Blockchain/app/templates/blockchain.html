@@ -1,0 +1,38 @@
+{% extends "public_templates/public_template.html" %} {% block title %} Blockchain {% endblock %} {% block main %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1 class="m-4">
+                Decide hacia donde va tu dinero!
+            </h1>
+            <hr>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">DNI</th>
+                        <th scope="col">Concepto</th>
+                        <th scope="col">Pago</th>
+                    </tr>
+                </thead>
+                <tbody id="MyTable">
+                    {% for item in tabla %}
+                    <tr>
+                        <td>{{ item.DNI }}</td>
+                        <td>{{ item.ConceptoPago }}</td>
+                        <td>{{ item.DineroAportado }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="container m-4">
+                {% if num_personas > 0 %}
+                <div class="card">
+                    <h4>Han pagado {{ num_personas }} personas</h4>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

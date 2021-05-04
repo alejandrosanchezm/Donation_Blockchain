@@ -1,0 +1,29 @@
+{% extends "public_templates/public_template.html" %} {% block title %} Administrador {% endblock %} {% block main %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>Panel de administrador</h1>
+            <div class="card">
+                <div class="card-body m-4">
+                    <form action="/admin" method="POST" enctype="multipart/form-data">
+                        <div class="form-group m-4">
+                            <label for="option_type">Elige la opción hacia donde quieres destinar tu dinero</label>
+                            <select class="form-control" id="option_type" name="option-type">
+                                <option value="" selected disabled hidden>Elegir opción</option>
+                                {% for key, value in spend_options.items() %}
+                                <option value="{{ key }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="exampleInputPassword1" class="form-label">Cantidad a gastar</label>
+                            <input type="number" class="form-control" name="quantity" id="quantity" min="0" max="10000" required>
+                        </div>
+                        <button type="submit" class="btn btn-danger m-4">Realizar transacción</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

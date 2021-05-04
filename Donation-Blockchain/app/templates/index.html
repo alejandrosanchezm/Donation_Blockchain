@@ -1,0 +1,45 @@
+ {% extends "public_templates/public_template.html" %} {% block title %} Blockchain - Pago {% endblock %} {% block main %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1 class="m-4">
+                Decide hacia donde va tu dinero!
+            </h1>
+            <div class="card">
+                <div class="card-body m-4">
+                    <form action="/" method="POST" enctype="multipart/form-data">
+                        <label for="dni">DNI</label>
+                        <input type="text" class="form-control  m-4" name="dni" id="dni" placeholder="01234567" required>
+                        <div class="form-group  m-4">
+                            <label for="payment_type">Selecciona la cantidad que quieres pagar</label>
+                            <select class="form-control" id="payment_type" name="payment-type" required>
+                                {% for key, value in pay_options.items() %}
+                                <option value="{{ key }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group m-4">
+                            <label for="option_type">Elige la opción hacia donde quieres destinar tu dinero</label>
+                            <select class="form-control" id="option_type" name="option-type" required>
+                                <option value="" selected disabled hidden>Elegir opción</option>
+                                {% for key, value in taxes_options.items() %}
+                                <option value="{{ key }}">{{ value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-danger m-4">Pagar</button>
+                    </form>
+                </div>
+            </div>
+            <hr>
+            <div class="container m-4">
+                {% if num_personas > 0 %}
+                <div class="card">
+                    <h4>Han pagado {{ num_personas }} personas</h4>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
