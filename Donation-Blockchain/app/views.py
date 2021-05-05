@@ -10,6 +10,7 @@ from options import OptionsData
 from blockchain import BloqueDecoder, BlockchainDecoder
 import traceback 
 from hashlib import sha256
+import multidifusion as md
 
 ###################################################################
 #                   VISTAS DE LA PÁGINA
@@ -28,38 +29,14 @@ def index():
     if request.method == "POST":
     
         # Recoger los valores del formulario y comprueba de que están todos
-        arguments = ['dni','option-type','payment-type']
-        for valor in arguments:
-            if valor not in request.values:
-
-                # No debería pasar, pero puede ser que intenten realizar un intento de pago de una manera fuera de la web
-                flash("Error: faltan datos","Warning")
-                return redirect(request.url)
-
-        #Validamos que sea el DNI en el formato correcto
-        if(vf.validarDNI(request.values['dni'])==1):
-            dni = request.values['dni']
-        else:
-            flash("Error: el DNI es inválido.","Warning")
+        valores = vf.index_post_args_check(request)
+        if not valores:
+            flash("Error: el DNI es incorrecto.","Warning")
             return redirect(request.url)
-
         try:
 
-            # Recogemos el concepto y el dinero
-            concepto = OptionsData.spend_options[request.values['option-type']]
-            dinero = OptionsData.pay_options[request.values['payment-type']]
-
-            # Guardamos los valores en el diccionario
-            valores = {
-                "tipoTransaccion":"pago", # indicamos que el tipo de transacción es de pago
-                "DNI":dni, #El hash lo calcula despues
-                "ConceptoPago":concepto,
-                "DineroAportado":int(dinero)
-            }
-
-            
             # Si todos los nodos devuelven un OK, registramos la nueva transaccion en nuestra blockchain
-            bloque = sd.blockchain.realizarPago(valores['DNI'],valores['ConceptoPago'],int(valores['DineroAportado']))
+            bloque = sd.blockchain.realizarPago(valores['DNI'],valores['ConceptoPago'],valores['DineroAportado'])
 
             # Si la cadena está vacía
             if bloque == None:
@@ -68,34 +45,16 @@ def index():
 
             # En caso contrario
             else:
-                nodos_llamados = []
-                # Multidifundimos el bloque a los nodos de la red
-                for nodo in sd.agenda:
-
-                    # Si no soy yo
-                    if sd.ip_cliente != nodo['ip'] or sd.puerto_cliente != nodo['puerto']:
-
-                        nodos_llamados.append(nodo)
-                        # Le envío la transacción realizada, y mi blockchain
-                        answer = vf.enviar_bloque(nodo['ip'],nodo['puerto'],valores,sd.blockchain)
-                        if answer != "OK":
-                            sd.blockchain.eliminarBloque()
-
-                            for nodo in nodos_llamados:
-                                answer = vf.solicitar_eliminar_bloque(nodo['ip'],nodo['puerto'])
-
-                            flash("El resto de nodos no han confirmado el bloque.","Danger")
-                            return redirect(request.url)
-
-            
-                # Añadimos los valores a la tabla a mostrar
-                sd.tabla.append(valores)
-
-                sd.saldo[valores['ConceptoPago']] += valores['DineroAportado']
-
-                flash("Bloque añadido","Success")
-                # Redirige a la página de blockchain
-                return redirect(url_for("blockchain"))
+                respuesta = md.multidifundirPago(valores,sd)
+                if respuesta == "ERROR":
+                    flash("El resto de nodos no han confirmado el bloque.","Danger")
+                    return redirect(request.url)
+                else:
+                    # Añadimos los valores a la tabla a mostrar
+                    vf.actualizarDatos(valores,sd) 
+                    flash("Bloque añadido","Success")
+                    # Redirige a la página de blockchain
+                    return redirect(url_for("blockchain"))
 
         except:
             traceback.print_exc() 
@@ -116,64 +75,31 @@ def admin():
     if request.method == "POST":
 
         # Recogemos los valores de la página
-        if 'option-type' in request.values:
-            option = request.values['option-type']
-        else:
-            option = None
-        if 'quantity' in request.values:
-            quantity = request.values['quantity']
-        else:
-            quantity = None
+        valores = vf.admin_post_args_check(request)
+        if not valores:
+            flash("Error: los datos introducidos no son correctos.","Warning")
+            return redirect(request.url)
 
-        # Si los valores son nulos, devolvemos un error
-        if option == None or quantity == None:
-            flash("Faltan datos.","Warning")
+        # Realizamos la transacción en nuestra blockchain y la enviamos a los nodos
+
+        bloque = sd.blockchain.realizarGasto(valores['IDAdministrador'],valores['ConceptoGasto'],valores['DineroGastado'])
+
+        # Si la cadena está vacía
+        if bloque == None:
+            flash("Error: estás intentando gastar de más en un concepto.","Warning")
             return redirect(request.url)
 
         # En caso contrario
         else:
 
-            # Realizamos la transacción en nuestra blockchain y la enviamos a los nodos
-            valores = {
-                'tipoTransaccion': "gasto",
-                'IDAdministrador': sd.id_login,
-                'ConceptoGasto': OptionsData.spend_options[option],
-                'DineroGastado': int(quantity)
-            }
-            bloque = sd.blockchain.realizarGasto(valores['IDAdministrador'],valores['ConceptoGasto'],valores['DineroGastado'])
-
-            # Si la cadena está vacía
-            if bloque == None:
-                flash("Error: estás intentando gastar de más truan","Warning")
+            # Multidifundimos el bloque a los nodos de la red
+            respuesta = md.multidifundirGasto(valores,sd)
+            if respuesta == "ERROR":
+                flash("Error: no todos los nodos han confirmado la transaccion.","warning")
                 return redirect(request.url)
-
-            # En caso contrario
             else:
-
-                # Multidifundimos el bloque a los nodos de la red
-                nodos_llamados = []
-                for nodo in sd.agenda:
-                    # Si no soy yo
-                    if sd.ip_cliente != nodo['ip'] or sd.puerto_cliente != nodo['puerto']:
-                        nodos_llamados.append(nodo)
-
-                        # Le envío la transacción realizada, y mi blockchain
-                        answer = vf.enviar_bloque(nodo['ip'],nodo['puerto'],valores,sd.blockchain)
-
-                        # Si el nodo no lo valida
-                        if answer != "OK":
-                            sd.blockchain.eliminarBloque()
-
-                            for nodo in nodos_llamados:
-                                answer = vf.solicitar_eliminar_bloque(nodo['ip'],nodo['puerto'])
-
-                            flash("Error: no todos los nodos han confirmado la transaccion.","warning")
-                            return redirect(request.url)
-
                 # En caso de que se haya multidifundido con éxito, se lo indicamos
-                sd.tabla.append(valores)
-                sd.saldo[valores['ConceptoGasto']] -= valores['DineroGastado']
-                sd.destinado[valores['ConceptoGasto']] += valores['DineroGastado']
+                vf.actualizarDatos(valores,sd)
                 flash("Bloque añadido","Success")
                 return redirect(url_for("blockchain"))
 
@@ -325,6 +251,7 @@ def recibir_bloque():
     # Comprobamos que recibimos un bloque 
     if 'bloque' in request.args and 'blockchain' in request.args:
 
+
         # Lo cargamos en formato json
         bloque = json.loads(request.args['bloque'])
         blockchain_recibida = BlockchainDecoder(request.args['blockchain'])
@@ -338,6 +265,7 @@ def recibir_bloque():
                 "DineroAportado":int(bloque['DineroAportado'])
             }
             sd.blockchain.realizarPago(valores['DNI'],valores["ConceptoPago"],valores["DineroAportado"])
+            sd.saldo[bloque['ConceptoPago']] += int(bloque['DineroAportado'])
 
         else:
 
@@ -350,6 +278,8 @@ def recibir_bloque():
             }
 
             sd.blockchain.realizarGasto(valores['IDAdministrador'],valores["ConceptoGasto"],valores["DineroGastado"])
+            sd.saldo[bloque['ConceptoGasto']] -= int(bloque['DineroGastado'])
+            sd.destinado[bloque['ConceptoGasto']] += int(bloque['DineroGastado'])
 
         if sd.blockchain.areEqual(blockchain_recibida):
             sd.tabla.append(valores)
@@ -414,4 +344,4 @@ def ver_transacciones():
     for item in sd.tabla:
         if 'DNI' in item and item['DNI']==doc:
             trans.append(item)
-    return render_template("blockchain.html", tabla=sd.tabla, trans = trans,saldo=sd.saldo)
+    return render_template("blockchain.html", tabla=sd.tabla, trans = trans,saldo=sd.saldo, destinado=sd.destinado)

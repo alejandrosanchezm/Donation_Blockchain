@@ -23,5 +23,7 @@ saldo = {
 }
 
 destinado = {
-    
+
 }
+
+semaforo = Semaphore(1)
