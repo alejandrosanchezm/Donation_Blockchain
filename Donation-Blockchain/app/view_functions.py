@@ -14,16 +14,8 @@ nodo a su agenda
 def comunicar_nuevo_nodo(ip_receptor,puerto_receptor,ip_nuevo_nodo,puerto_nuevo_nodo):
 
     # Hago una petición POST a un nodo con los datos del nuevo nodo
-    server = "http://" + ip_receptor + ":" + puerto_receptor + "/añadir_nodo_red/" + ip_nuevo_nodo + "/" + puerto_nuevo_nodo
+    server = "http://" + ip_receptor + ":" + puerto_receptor + "/anadir_nodo_red/" + ip_nuevo_nodo + "/" + puerto_nuevo_nodo
     requests.post(server, headers={ "Content-Type" : "application/json"})
-
-"""
-def enviar_blockchain(ip_receptor,puerto_receptor, blockchain):
-
-    # Hago una petición POST a un nodo con los datos de la blockchain
-    server = "http://" + ip_receptor + ":" + puerto_receptor + "/actualizar_blockchain"
-    requests.post(server, headers={ "Content-Type" : "application/json"}, params={'blockchain':blockchain})   
-"""
 
 def enviar_bloque(ip_receptor,puerto_receptor, bloque, blockchain):
 
