@@ -235,6 +235,7 @@ class Blockchain:
                 if key == "DineroAportado" or key == "DineroGastado":
                     dineroInvertido += value
         
+        print(dineroInvertido, dineroAGastar)
         # VerificaciOn 2: El gasto no puede superar a la aportaciOn de fondos para ese concepto
         if dineroInvertido < dineroAGastar:
             print("ERROR. No se puede gastar mas dinero del invertido por los contribuyentes en este concepto.")
