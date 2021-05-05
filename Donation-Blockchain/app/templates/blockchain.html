@@ -1,36 +1,105 @@
-{% extends "public_templates/public_template.html" %} {% block title %} Blockchain {% endblock %} {% block main %}
+{% extends "public_templates/public_template.html" %} {% block title %} Blockchain {% endblock %} {% block head %}
+<meta http-equiv="Refresh" content="30"> {% endblock %} {% block main %}
 
-<div class="container">
+<div class="container" style="margin-top:30px;">
     <div class="row">
         <div class="col">
             <h1 class="m-4">
-                Decide hacia donde va tu dinero!
+                Listado de transacciones realizadas.
             </h1>
-            <hr>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">DNI</th>
-                        <th scope="col">Concepto</th>
-                        <th scope="col">Pago</th>
-                    </tr>
-                </thead>
-                <tbody id="MyTable">
-                    {% for item in tabla %} {%if item.tipoTransaccion == 'pago'%}
-                    <tr class='table-success'>
-                        <td>{{ item.DNI }}</td>
-                        <td>{{ item.ConceptoPago }}</td>
-                        <td>{{ item.DineroAportado }}</td>
-                    </tr>
-                    {%elif item.tipoTransaccion == 'gasto'%}
-                    <tr class='table-danger'>
-                        <td>{{ item.IDAdministrador }}</td>
-                        <td>{{ item.ConceptoGasto }}</td>
-                        <td>{{ item.DineroGastado }}</td>
-                    </tr>
-                    {%endif%} {% endfor %}
-                </tbody>
-            </table>
+            <hr> {% if tabla|length > 0 %}
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        {% for key, value in saldo.items() %}
+                        <div class="col">
+                            <div class="card">
+                                <div class="card-body">
+                                    <p>{{ key }}</p>
+                                    <p>Saldo disponible: {{ value }}€</p>
+                                    <p>Destinado: {{ destinado[key] }}€</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">DNI</th>
+                                <th scope="col">Concepto</th>
+                                <th scope="col">Pago</th>
+                                <th scope="col">Gasto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="MyTable">
+                            {% for item in tabla %} {%if item.tipoTransaccion == 'pago' %}
+                            <tr class='table-success'>
+                                <td>{{ getsha256str(item.DNI) }}</td>
+                                <td>{{ item.ConceptoPago }}</td>
+                                <td>{{ item.DineroAportado }}</td>
+                                <td>-</td>
+                            </tr>
+                            {%elif item.tipoTransaccion == 'gasto'%}
+                            <tr class='table-danger'>
+                                <td>{{ getsha256str(item.IDAdministrador) }}</td>
+                                <td>{{ item.ConceptoGasto }}</td>
+                                <td>-</td>
+                                <td>{{ item.DineroGastado }}</td>
+                            </tr>
+                            {%endif%} {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <form action="/ver_transacciones" method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="username">DNI</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="docIdent" name="docIdent" placeholder="Introduce tu DNI" required>
+
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-danger m-4">Ver</button>
+                    </form>
+                    <div class="card">
+                        <div class="card-body">
+                            {% if trans|length > 0 %}
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">DNI</th>
+                                        <th scope="col">Concepto</th>
+                                        <th scope="col">Pago</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="MyTable">
+                                    {% for item in trans %}
+                                    <tr class='table-info'>
+                                        <td>{{ getsha256str(item.DNI) }}</td>
+                                        <td>{{ item.ConceptoPago }}</td>
+                                        <td>{{ item.DineroAportado }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <p>De momento no has realizado ninguna transacción.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% else %}
+            <p>De momento la Blockchain está vacía.</p>
+            {% endif %}
         </div>
     </div>
 </div>
