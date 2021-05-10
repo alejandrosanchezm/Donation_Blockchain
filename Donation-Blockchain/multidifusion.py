@@ -1,7 +1,11 @@
-from app import app
+from app import app, view_functions as vf
 import requests
 import json
 from blockchain import BlockchainEncoder
+
+"""
+Clase que se encarga de realizar la multidifusión del gasto y del pago
+"""
 
 def multidifundirGasto(valores, sd):
     nodos_llamados = []
@@ -44,12 +48,11 @@ def multidifundirPago(valores, sd):
                 return "ERROR"
     return "OK"
 
-
 def enviar_bloque(ip_receptor,puerto_receptor, bloque, blockchain):
 
     # Hago una petición POST a un nodo con los datos de la blockchain
     server = "http://" + ip_receptor + ":" + puerto_receptor + "/recibir_bloque"
-    answer = requests.post(server, headers={ "Content-Type" : "application/json"}, params={"bloque":json.dumps(bloque),"blockchain":BlockchainEncoder().encode(blockchain)})   
+    answer = requests.post(server, headers={ "Content-Type" : "application/json"}, params={"bloque":json.dumps(bloque),"blockchain":blockchain.hashBlockchain})   
     return bytes.decode(answer.content)
 
 def solicitar_eliminar_bloque(ip_receptor,puerto_receptor):
