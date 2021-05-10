@@ -39,8 +39,6 @@ Así mismo, difundirá a todos los nodos de la red la ip y puerto del nuevo nodo
 - Si un nodo cliente de la red se cierra, se indica al resto de nodos que ese nodo se ha eliminado para que lo eliminen de la agenda.
 - Si es el nodo coordinador el que se elimina, antes de cerrarse elegirá al primer nodo de la red como nodo coordinador
 
-![alt text](https://raw.githubusercontent.com/alejandrosanchezm/blockchain/master/imgs/Esquema2.png)
-
 Los argumentos para iniciar el servidor son los siguientes en este orden:
 - ip cliente (es decir, la nuestra)
 - puerto cliente (es decir, la nuestra)
