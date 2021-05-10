@@ -8,8 +8,6 @@ import os
 from blockchain import Blockchain
 from blockchain import BlockchainDecoder
 import re
-import redis
-from rq import Queue
 import time
 from options import OptionsData
 import joblib
@@ -54,20 +52,6 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = "OCML3BRawWEUeaxcuKHLpw"
 
-"""
-def initializeQueue():
-    try:
-        os.system("redis-server")
- 
-    except:
-        print("Error al iniciar la cola de peticiones")
-        sys.exit()
-
-threading.Thread(target=initializeQueue)
-time.sleep(3)
-r = redis.Redis()
-queue = Queue(connection=r)
-"""
 """
 ===================================================
             ACCIONES DE INICIO
@@ -149,6 +133,7 @@ if sd.nodo_coordinador == 'False':
     sd.saldo = response.json()['saldo']
     sd.destinado = response.json()['destinado']
     sd.tabla = response.json()['tabla']
+    print(response.json()['blockchain'])
     sd.blockchain =  BlockchainDecoder(json.loads(response.json()['blockchain']))
     json_data = json.loads(response.json()['blockchain'])
 

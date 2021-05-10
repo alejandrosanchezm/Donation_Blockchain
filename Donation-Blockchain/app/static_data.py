@@ -1,7 +1,6 @@
-from threading import Semaphore
-
 agenda = []
 
+# Datos relacionados con las ip / puertos iniciales
 ip_cliente = None
 puerto_cliente = None
 ip_coordinador = None
@@ -26,4 +25,3 @@ destinado = {
 
 }
 
-semaforo = Semaphore(1)
