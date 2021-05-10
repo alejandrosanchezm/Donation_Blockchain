@@ -17,9 +17,6 @@ import multidifusion as md
 ###################################################################
 """
 Página de inicio de la aplicación cliente.
-Acepta métodos GET Y POST
-- En el Método GET, simplemente renderiza la página de inicio
-- En el Método POST, recoge los datos y los trata
 """
 
 @app.route("/",methods=["GET","POST"])
@@ -127,7 +124,7 @@ def admin():
 """
 Vista de la tabla de blockchain
 """
-@app.route("/blockchain")
+@app.route("/blockchain",methods=['GET','POST'])
 def blockchain():
     print(sd.tabla)
     sd.blockchain.mostrarBlockchain()
@@ -254,7 +251,7 @@ def recibir_bloque():
 
         # Lo cargamos en formato json
         bloque = json.loads(request.args['bloque'])
-        blockchain_recibida = BlockchainDecoder(request.args['blockchain'])
+        blockchain_recibida = json.loads(request.args['blockchain'])
 
         if bloque['tipoTransaccion'] == "pago":
             # Añadimos los nuevos datos a la tabla de valores que se van a mostrar
@@ -265,8 +262,6 @@ def recibir_bloque():
                 "DineroAportado":int(bloque['DineroAportado'])
             }
             sd.blockchain.realizarPago(valores['DNI'],valores["ConceptoPago"],valores["DineroAportado"])
-            sd.saldo[bloque['ConceptoPago']] += int(bloque['DineroAportado'])
-
         else:
 
             # Añadimos los nuevos datos a la tabla de valores que se van a mostrar
@@ -276,12 +271,16 @@ def recibir_bloque():
                 "ConceptoGasto":bloque['ConceptoGasto'],
                 "DineroGastado":int(bloque['DineroGastado'])
             }
-
             sd.blockchain.realizarGasto(valores['IDAdministrador'],valores["ConceptoGasto"],valores["DineroGastado"])
-            sd.saldo[bloque['ConceptoGasto']] -= int(bloque['DineroGastado'])
-            sd.destinado[bloque['ConceptoGasto']] += int(bloque['DineroGastado'])
 
-        if sd.blockchain.areEqual(blockchain_recibida):
+        #if vf.getsha256str(sd.blockchain) == blockchain_recibida:
+        #if sd.blockchain.areEqual(blockchain_recibida):
+        if sd.blockchain.hashBlockchain == blockchain_recibida:
+            if valores['tipoTransaccion'] == 'pago':
+                sd.saldo[bloque['ConceptoPago']] += int(bloque['DineroAportado'])
+            else:
+                sd.saldo[bloque['ConceptoGasto']] -= int(bloque['DineroGastado'])
+                sd.destinado[bloque['ConceptoGasto']] += int(bloque['DineroGastado'])
             sd.tabla.append(valores)
             # Devolvemos OK
             return "OK", 200
@@ -293,10 +292,17 @@ def recibir_bloque():
     else:
         return "Necesito un bloque", 400
 
+"""
+Acción a la que se llama cuando no se ha confirmado el último bloque y se tiene que eliminar
+"""
 @app.route("/eliminar_ultimo_bloque", methods=["POST"])
 def eliminar_ultimo_bloque():
     sd.blockchain.eliminarBloque()
     return "OK"
+
+###################################################################
+#               FUNCIONES PARA LOGGING ADMINISTRADOR              #
+###################################################################
 
 @app.route("/amiadmin")
 def amiadmin():
@@ -325,6 +331,10 @@ def login():
         else:
             flash("Intentos de inicio de sesión superados.", "warning")
             return redirect(request.url)
+
+###################################################################
+#               FUNCIONES PARA VER TRANSACCIONES                  #
+###################################################################
 
 @app.context_processor
 def my_utility_processor():
