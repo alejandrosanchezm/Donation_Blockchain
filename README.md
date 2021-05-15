@@ -6,7 +6,7 @@ Aplicación distribuida para la donación de una cantidad de dinero y destinarla
 
 Cómo instalar el repositorio:
 
-    git clone https://github.com/alejandrosanchezm/VotingBlockchain.git
+    git clone https://github.com/alejandrosanchezm/blockchain.git
 
 Para activar el entorno virtual
 
