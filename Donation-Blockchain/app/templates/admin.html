@@ -1,8 +1,25 @@
 {% extends "public_templates/public_template.html" %} {% block title %} Administrador {% endblock %} {% block main %}
-<div class="container">
+<div class="container" style="margin-top:30px;">
     <div class="row">
         <div class="col">
             <h1>Panel de administrador</h1>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        {% for key, value in saldo.items() %}
+                        <div class="col">
+                            <div class="card">
+                                <div class="card-body">
+                                    <p>{{ key }}</p>
+                                    <p>Saldo disponible: {{ value }}€</p>
+                                    <p>Destinado: {{ destinado[key] }}€</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
             <div class="card">
                 <div class="card-body m-4">
                     <form action="/admin" method="POST" enctype="multipart/form-data">
@@ -17,7 +34,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="exampleInputPassword1" class="form-label">Cantidad a gastar</label>
-                            <input type="number" class="form-control" name="quantity" id="quantity" min="0" max="10000" required>
+                            <input type="number" class="form-control" name="quantity" id="quantity" min="0" max="100000" required>
                         </div>
                         <button type="submit" class="btn btn-danger m-4">Realizar transacción</button>
                     </form>

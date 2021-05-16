@@ -45,7 +45,7 @@ class Bloque:
 class Blockchain:
 
     # Constructor
-    def __init__(self, send_blockchain=None, send_transaccionNoValidada=None):
+    def __init__(self, send_blockchain=None, send_transaccionNoValidada=None,  send_hashBlockchain=None, send_datosBlockchain=None):
 
         # blockchain: lista de objetos Bloque
         # transaccionNoValidada: diccionario que guarda la transacciOn de forma temporal antes de aNadirse al bloque (solo se considera 1 transacciOn por bloque)
@@ -57,6 +57,14 @@ class Blockchain:
             self.transaccionNoValidada = {}
         else:
             self.transaccionNoValidada = send_transaccionNoValidada
+        if send_hashBlockchain == None:
+            self.hashBlockchain = 0
+        else:
+            self.hashBlockchain = send_hashBlockchain
+        if send_datosBlockchain == None:
+            self.datosBlockchain = ""
+        else:
+            self.datosBlockchain = send_datosBlockchain
 
         # CreaciOn del bloque gEnesis (se toma por 0 el valor del hash anterior)
         if send_blockchain == None:
@@ -65,21 +73,23 @@ class Blockchain:
             # Si el bloque gEnesis es nulo devolver None
             if bloqueGenesis == None:
                 return None
+    
+    # FunciOn que calcula el hash de la Blockchain.
+    # Se transforma a String toda la informaciOn de todos los bloques de la blockchain antes de calcular el hash
+    # DeberA llamarse cada vez que se aNade un nuevo bloque a la cadena
+    def calcularHashBlockchain(self):
+        datosBloque = ""
 
-    def areEqual(self,b2):
-        if b2 != None:
-            if len(self.blockchain) == len(b2.blockchain):
-                for i in range(0,len(self.blockchain)):
-                    bloque1 = self.blockchain[i]
-                    bloque2 = b2.blockchain[i]
-                    if bloque1.hashBloqueAnterior != bloque2.hashBloqueAnterior: return False
-                    if bloque1.transaccion != bloque2.transaccion: return False
-                    if bloque1.indiceBloque != bloque2.indiceBloque: return False
-                    if bloque1.incognitaDeMinado != bloque2.incognitaDeMinado: return False
-                    if bloque1.hashBloque != bloque2.hashBloque: return False
-                return True
-            else:
-                return False
+        datosBloque = str(self.ultimoBloque.indiceBloque) + str(self.ultimoBloque.transaccion) + str(self.ultimoBloque.incognitaDeMinado) + str(self.ultimoBloque.hashBloque) + str(self.ultimoBloque.hashBloqueAnterior)
+        self.datosBlockchain += datosBloque
+        
+        blockchainJSON = json.dumps(self.datosBlockchain).encode()
+        self.hashBlockchain = sha256(blockchainJSON).hexdigest()
+
+        print("HASH BLOCKCHAIN (ACTUALIZADO): " + str(self.hashBlockchain))
+
+        return self.hashBlockchain
+
 
     # Propiedad empleada para la devoluciOn del Ultimo bloque de la cadena o None si la cadena estA vacIa
     @property
@@ -235,6 +245,7 @@ class Blockchain:
                 if key == "DineroAportado" or key == "DineroGastado":
                     dineroInvertido += value
         
+        print(dineroInvertido, dineroAGastar)
         # VerificaciOn 2: El gasto no puede superar a la aportaciOn de fondos para ese concepto
         if dineroInvertido < dineroAGastar:
             print("ERROR. No se puede gastar mas dinero del invertido por los contribuyentes en este concepto.")
@@ -254,6 +265,10 @@ class Blockchain:
             self.mostrarBloque(bloque)
             return bloque
         
+    def mostrarBlockchain(self):
+        for bloque in self.blockchain:
+            self.mostrarBloque(bloque)
+
 class BloqueEncoder(JSONEncoder):
 
     def default(self, object):
@@ -272,6 +287,8 @@ class BlockchainEncoder(JSONEncoder):
             data = {}
             data['transaccionNoValidada'] = object.transaccionNoValidada
             data['blockchain'] = [BloqueEncoder().encode(x) for x in object.blockchain]
+            data['hashBlockchain'] = object.hashBlockchain
+            data['datosBlockchain'] = object.datosBlockchain
             return data
 
         else:
@@ -279,9 +296,20 @@ class BlockchainEncoder(JSONEncoder):
 
 def BlockchainDecoder(json_string):
 
+    if type(json_string) == str:
+        json_string_formatted = json.loads(json_string)
+    else:
+        json_string_formatted = json_string
     try:
-        bloques = [Bloque(hashBloqueAnterior=x['hashBloqueAnterior'],transaccion=x['transaccion'],indiceBloque=x['indiceBloque'],send_incognitaDeMinado=x['incognitaDeMinado'],send_hashBloque=x['hashBloque']) for x in json_string['blockchain']]
-        return Blockchain(bloques, json_string['transaccionNoValidada'])
+        bloques = []
+        #bloques = [Bloque(hashBloqueAnterior=x['hashBloqueAnterior'],transaccion=x['transaccion'],indiceBloque=x['indiceBloque'],send_incognitaDeMinado=x['incognitaDeMinado'],send_hashBloque=x['hashBloque']) for x in json_string_formatted['blockchain']]
+        for block in json_string_formatted['blockchain']:
+            if type(block) == str:
+                x = json.loads(block)
+            else:
+                x = block
+            bloques.append(Bloque(hashBloqueAnterior=x['hashBloqueAnterior'],transaccion=x['transaccion'],indiceBloque=x['indiceBloque'],send_incognitaDeMinado=x['incognitaDeMinado'],send_hashBloque=x['hashBloque']))
+        return Blockchain(bloques, json_string_formatted['transaccionNoValidada'], json_string_formatted['hashBlockchain'], json_string_formatted['datosBlockchain'])
     except:
         traceback.print_exc() 
         return None
