@@ -133,6 +133,10 @@ if sd.nodo_coordinador == 'False':
     sd.saldo = response.json()['saldo']
     sd.destinado = response.json()['destinado']
     sd.tabla = response.json()['tabla']
+<<<<<<< HEAD
+=======
+    print(response.json()['blockchain'])
+>>>>>>> 0809871c897f9fe3c22511b7d0ff6dace95908b9
     sd.blockchain =  BlockchainDecoder(json.loads(response.json()['blockchain']))
     json_data = json.loads(response.json()['blockchain'])
 

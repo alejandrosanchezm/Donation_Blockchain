@@ -1,7 +1,12 @@
 from app import app, view_functions as vf
 import requests
 import json
+<<<<<<< HEAD
 from blockchain import BlockchainEncoder, BlockchainDecoder
+=======
+from blockchain import BlockchainEncoder
+
+>>>>>>> 0809871c897f9fe3c22511b7d0ff6dace95908b9
 """
 Clase que se encarga de realizar la multidifusión del gasto y del pago
 """
@@ -15,7 +20,11 @@ def multidifundirGasto(valores, sd):
 
             # Le envío la transacción realizada, y mi blockchain
             answer = enviar_bloque(nodo['ip'],nodo['puerto'],valores,sd.blockchain)
+<<<<<<< HEAD
             print(answer)
+=======
+
+>>>>>>> 0809871c897f9fe3c22511b7d0ff6dace95908b9
             # Si el nodo no lo valida
             if answer != "OK":
                 sd.blockchain.eliminarBloque()
@@ -38,7 +47,10 @@ def multidifundirPago(valores, sd):
             nodos_llamados.append(nodo)
             # Le envío la transacción realizada, y mi blockchain
             answer = enviar_bloque(nodo['ip'],nodo['puerto'],valores,sd.blockchain)
+<<<<<<< HEAD
             print(answer)
+=======
+>>>>>>> 0809871c897f9fe3c22511b7d0ff6dace95908b9
             if answer != "OK":
                 sd.blockchain.eliminarBloque()
 
@@ -47,7 +59,11 @@ def multidifundirPago(valores, sd):
 
                 return "ERROR"
     return "OK"
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> 0809871c897f9fe3c22511b7d0ff6dace95908b9
 def enviar_bloque(ip_receptor,puerto_receptor, bloque, blockchain):
 
     # Hago una petición POST a un nodo con los datos de la blockchain
@@ -59,6 +75,7 @@ def solicitar_eliminar_bloque(ip_receptor,puerto_receptor):
     # Hago una petición POST a un nodo con los datos de la blockchain
     server = "http://" + ip_receptor + ":" + puerto_receptor + "/eliminar_ultimo_bloque"
     answer = requests.post(server, headers={ "Content-Type" : "application/json"})   
+<<<<<<< HEAD
     return bytes.decode(answer.content)
 
 ##############################################################################
@@ -115,3 +132,6 @@ def pedir_blockchain(ip_receptor,puerto_receptor):
     server = "http://" + ip_receptor + ":" + puerto_receptor + "/pedir_blockchain"
     answer = requests.get(server, headers={ "Content-Type" : "application/json"})   
     return BlockchainDecoder(json.loads(answer.content))
+=======
+    return bytes.decode(answer.content)
+>>>>>>> 0809871c897f9fe3c22511b7d0ff6dace95908b9

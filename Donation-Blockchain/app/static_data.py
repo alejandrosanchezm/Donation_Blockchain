@@ -12,7 +12,10 @@ ip_coordinador = None
 puerto_coordinador = None
 nodo_coordinador = False
 
+<<<<<<< HEAD
 # Datos de la tabla de blockchain que se muestra en la página
+=======
+>>>>>>> 0809871c897f9fe3c22511b7d0ff6dace95908b9
 tabla = []
 tabla_anterior = []
 
@@ -39,3 +42,16 @@ destinado = {
 
 destinado_anterior = None
 
+<<<<<<< HEAD
+=======
+id_login = ""
+
+saldo = {
+
+}
+
+destinado = {
+
+}
+
+>>>>>>> 0809871c897f9fe3c22511b7d0ff6dace95908b9
