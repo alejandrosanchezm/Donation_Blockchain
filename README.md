@@ -53,9 +53,4 @@ Para iniciar un nodo cliente:
   
     $ python run.py -c False -ip localhost -p 5001 -ipc localhost -pc 5000
     
-### Cómo funciona la Blockchain
-
-Este es el esquema mediante el cual funciona la blockchain:
-
-![alt text](https://raw.githubusercontent.com/alejandrosanchezm/blockchain/master/imgs/Diagrama.png)
 
